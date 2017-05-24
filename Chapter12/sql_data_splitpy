@@ -1,0 +1,30 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+"""
+Created on Thu May 18 16:39:21 2017
+
+@author: frank
+"""
+
+import pandas as pd
+from sqlalchemy import create_engine
+
+engine=create_engine('mysql+pymysql://root:root@127.0.0.1:3306/WebAn?charset=utf8')
+sql=pd.read_sql('changed_gzdata',engine,chunksize=2500)
+
+for i in sql:
+    d =i.copy()
+    d['type_1']=d['fullURL']
+    d['type_1'][d['fullURL'].str.contains('(ask)|(askzt)')]='zixun'
+    d['type_1'][d['fullURL'].str.contains('(zhishi)|(faguizt)|(info)')]='zhishi'
+    d['type_2']=d['fullURL']
+    d['type_2'][d['fullURL'].str.contains('mingshi')]='mingshi'
+    d['type_2'][d['fullURL'].str.contains('shuifa')]='shuifa'
+    d['type_2'][d['fullURL'].str.contains('jiaotong')]='jiaotong'
+    d['type_2'][d['fullURL'].str.contains('hunyin')]='hunyin'
+    d['type_3']=d['fullURL']
+    d['type_3'][d['fullURL'].str.contains('fagui')]='fagui'
+    d['type_3'][d['fullURL'].str.contains('yys')]='yys'
+    d['type_3'][d['fullURL'].str.contains('jtnews')]='jtnews'
+    d.to_sql('splited_gzdta',engine,index=False,if_exists='append')
+    
